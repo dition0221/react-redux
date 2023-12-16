@@ -1,17 +1,12 @@
-import { connect } from "react-redux";
-import { IState } from "./../store";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { IToDo } from "../store";
 
-function Detail() {
-  return <div>Detail</div>;
+export default function Detail() {
+  // Check for matching 'params' & 'toDos.id'
+  const { id } = useParams();
+  const toDos = useSelector((state: IToDo[]) => state);
+  const toDo = id && toDos.find((toDo) => toDo.id === parseInt(id));
+
+  return <div>{JSON.stringify(toDo) ?? "Undefined"}</div>;
 }
-
-function mapStateToProps(state: IState[], ownProps) {
-  const {
-    match: {
-      params: { id },
-    },
-  } = ownProps;
-  return { toDo: state.find((toDo) => toDo.id === parseInt(id)) };
-}
-
-export default connect(mapStateToProps)(Detail);

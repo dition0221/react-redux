@@ -1,15 +1,11 @@
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
-import { IAction, IState, actionCreators } from "../store";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { IToDo, removeToDo } from "../store";
 
-interface IToDoProps {
-  text: string;
-  id: number;
-  onBtnClick: () => IAction;
-}
+export default function ToDo({ text, id }: IToDo) {
+  const dispatch = useDispatch();
+  const onBtnClick = () => dispatch(removeToDo(id));
 
-function ToDo({ text, id, onBtnClick }: IToDoProps) {
   return (
     <li>
       <Link to={`/${id}`}>{text}</Link>
@@ -17,11 +13,3 @@ function ToDo({ text, id, onBtnClick }: IToDoProps) {
     </li>
   );
 }
-
-function mapDispatchToProps(dispatch: Dispatch<IAction>, ownProps: IState) {
-  return {
-    onBtnClick: () => dispatch(actionCreators.deleteToDo(ownProps.id)),
-  };
-}
-
-export default connect(null, mapDispatchToProps)(ToDo);

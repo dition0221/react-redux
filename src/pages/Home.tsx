@@ -1,24 +1,22 @@
 import { useForm } from "react-hook-form";
-import { connect } from "react-redux";
-import { IAction, IState, actionCreators } from "../store";
-import { Dispatch } from "redux";
+import { useDispatch, useSelector } from "react-redux";
+import { IToDo, addToDo } from "../store";
+// Components
 import ToDo from "../components/ToDo";
-import { Link } from "react-router-dom";
-
-interface IHomeProps {
-  toDos: IState[];
-  addToDo: (text: string) => IAction;
-}
 
 interface IForm {
   text: string;
 }
 
-function Home({ toDos, addToDo }: IHomeProps) {
+export default function Home() {
+  // Redux
+  const toDos = useSelector((state: IToDo[]) => state);
+  const dispatch = useDispatch();
+
   // <form>
   const { register, handleSubmit, reset } = useForm<IForm>();
   const onSubmit = ({ text }: IForm) => {
-    addToDo(text);
+    dispatch(addToDo(text));
     reset();
   };
 
@@ -29,24 +27,11 @@ function Home({ toDos, addToDo }: IHomeProps) {
         <input {...register("text")} type="text" />
         <button>Add</button>
       </form>
-      <Link to="/1">go 1</Link>
       <ul>
-        {toDos.map((toDo) => (
+        {toDos?.map((toDo) => (
           <ToDo {...toDo} key={toDo.id} />
         ))}
       </ul>
     </>
   );
 }
-
-function mapStateToProps(state: IState[]) {
-  return { toDos: state };
-}
-
-function mapDispatchToProps(dispatch: Dispatch<IAction>) {
-  return {
-    addToDo: (text: string) => dispatch(actionCreators.addToDo(text)),
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
