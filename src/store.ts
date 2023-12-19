@@ -1,4 +1,11 @@
-import { PayloadAction, configureStore, createSlice } from "@reduxjs/toolkit";
+import {
+  PayloadAction,
+  combineReducers,
+  configureStore,
+  createSlice,
+} from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 type Text = string;
 type Id = number;
@@ -6,6 +13,11 @@ type Id = number;
 export interface IToDo {
   text: Text;
   id: Id;
+}
+
+export interface IRootState {
+  toDos: IToDo[];
+  isDarkTheme: boolean;
 }
 
 /*
@@ -28,9 +40,9 @@ const reducer = createReducer([] as IState[], (builder) => {
 });
 */
 
-const toDos = createSlice({
+const toDosSlice = createSlice({
   name: "toDos",
-  initialState: [{ text: "Test", id: 1 }] as IToDo[],
+  initialState: [{ text: "by dition0221", id: 1 }] as IToDo[],
   reducers: {
     addToDo: (state, action: PayloadAction<Text>) => {
       state.push({ text: action.payload, id: Date.now() });
@@ -39,8 +51,32 @@ const toDos = createSlice({
       state.filter((toDo) => toDo.id !== action.payload),
   },
 });
-export const { addToDo, removeToDo } = toDos.actions;
+export const { addToDo, removeToDo } = toDosSlice.actions;
 
-const store = configureStore({ reducer: toDos.reducer });
+const isDarkThemeSlice = createSlice({
+  name: "isDarkTheme",
+  initialState: false as boolean, // lightTheme
+  reducers: {
+    toggleTheme: (state) => !state,
+  },
+});
+export const { toggleTheme } = isDarkThemeSlice.actions;
 
-export default store;
+// Persist store
+const persistConfig = {
+  key: "root",
+  storage,
+};
+const rootReducer = combineReducers({
+  toDos: toDosSlice.reducer,
+  isDarkTheme: isDarkThemeSlice.reducer,
+});
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
+export const persistedStore = persistStore(store);
