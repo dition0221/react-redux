@@ -289,3 +289,81 @@
       const onClick = () => dispatch(addToDo(text));
       ```
 - **23-12-19 : Redux-Persist + Deploy**
+  - Redux-Persist 패키지
+    - redux의 state를 지속적으로 저장하고 복원하기 위한 라이브러리
+      - 웹 외에도 사용 가능 (React Native 등)
+      - 'recoil-persist'와 같은 기능
+    - 설치법 : `npm i redux-persist`
+    - 사용법
+      1. redux-persist의 설정객체를 생성하기
+         - 기본형
+           ```
+           const 설정객체명 = {
+             key: 키명,
+             storage: 스토맂,
+             blacklist?: ["리듀서명"],
+             whitelist?: ["리듀서명"],
+           };
+           ```
+         - 스토리지
+           - localStorage : `import storage from "redux-persist/lib/storage;"`
+           - sessionStorage : `import storageSession from "redux-persist/lib/storage/session";`
+           - 다른 스토리지들은 <a href="https://github.com/rt2zz/redux-persist?tab=readme-ov-file#storage-engines" target="_blank">공식 문서</a> 참고
+           - 선언 파일을 찾을 수 없을 시 'react-app-env.d.ts'에서 `/// <reference types="redux-persist" />`를 추가
+         - ex.
+           ```
+           import storage from "redux-persist/lib/storage";
+           const persistConfig = {
+             key: "root",
+             storage,
+           };
+           ```
+      2. reducer를 Redux-Persist에 연결하는 store를 생성하기
+         - 기본형
+           ```
+           const 지속리듀서명 = persistReducer(설정객체, 루트리듀서);
+           const 스토어명 = configureStore({ reducer: 지속리듀서명 });
+           ```
+         - 브라우저 콘솔에서 직렬화 error 시 'configureStore'에 아래와 같은 middleware 프로퍼티를 추가
+           ```
+           middleware: (getDefaultMiddleware) =>
+             getDefaultMiddleware({
+               serializableCheck: false,
+             }),
+           ```
+           - Redux에서 값을 주고, 받을 떄 object 형태의 값을 string 형태로 변환(JSON.stringify)하는데, 이 상황에서 변환이 불가능한 값을 전달했다는 error
+             - 직렬화 : object -> string으로 변환하는 것 (JSON.stringify)
+             - 역직렬화 : string -> object로 변환하는 것 (JSON.parse)
+           - <a href="https://despiteallthat.tistory.com/237" target="_blank">참고자료</a>
+         - ex.
+           ```
+           const rootReducer = combineReducers({ toDos: toDos.reducer });
+           const persistedReducer = persistReducer(persistConfig, rootReducer);
+           export const store = configureStore({
+             reducer: persistedReducer,
+             middleware: (getDefaultMiddleware) =>
+               getDefaultMiddleWare({
+                 serializableCheck: false,
+               }),
+           });
+           ```
+      3. 스토리지에 지속시키는 store 생성하기
+         - 기본형 : `const 지속스토어명 = persistStore(스토어명);`
+         - ex. `export const persistedStore = persistStore(store);`
+      4. '&lt;PersistGate&gt;' 컴포넌트로 &lt;App /&gt;을 감싸주기
+         - 기본형
+           ```
+           <Provider store={store}>
+             <PersistGate persistor={지속스토어명} loading?={로딩중보여줄컴포넌트}>
+               <App / >
+             </PersistGate>
+           </Provider>
+           ```
+         - 'persistor' 프로퍼티 : 지속스토어를 첨부
+         - 'loading' 프로퍼티 : [옵션] 로딩 중에 보여줄 컴포넌트
+    - <a href="https://github.com/rt2zz/redux-persist#readme" target="_blank">공식 문서</a>
+    - <a href="https://velog.io/@bcl0206/%EC%83%88%EB%A1%9C%EA%B3%A0%EC%B9%A8-%ED%9B%84%EC%97%90%EB%8F%84-store-state-%EC%9C%A0%EC%A7%80%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95-Redux-persist" target="_blank">참고 자료</a>
+- **23-12-20 : Deploy(2)**
+  - Fix : to-do 입력 시 무조건 홈으로 이동하도록 수정
+  - Update : rich link preview, favicon 추가
+  - Issue : 썸네일이 제대로 출력되지 않는 현상

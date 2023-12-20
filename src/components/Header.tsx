@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { IRootState, addToDo, toggleTheme } from "../store";
-import { Link, useMatch, useParams } from "react-router-dom";
+import { Link, useMatch, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 const HeaderContainer = styled.header`
@@ -48,8 +48,6 @@ const ThemeBtn = styled(HomeBtn)`
   left: auto;
   right: 0;
 `;
-
-const FormContainer = styled.div``;
 
 const Form = styled.form`
   width: 100%;
@@ -99,6 +97,7 @@ interface IForm {
 
 export default function Header() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Title
   const homeMatch = useMatch("/");
@@ -120,6 +119,7 @@ export default function Header() {
   const onSubmit = ({ text }: IForm) => {
     dispatch(addToDo(text));
     reset();
+    navigate("/");
   };
 
   return (
@@ -146,24 +146,22 @@ export default function Header() {
         </ThemeBtn>
       </TitleContainer>
 
-      <FormContainer>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            {...register("text", {
-              required: "Error: Please write a to-do.",
-              maxLength: {
-                value: 10,
-                message: "Error: Please write less then 10.",
-              },
-            })}
-            type="text"
-            required
-            maxLength={10}
-          />
-          <FormBtn>Add</FormBtn>
-          <Error>{errors.text?.message}</Error>
-        </Form>
-      </FormContainer>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Input
+          {...register("text", {
+            required: "Error: Please write a to-do.",
+            maxLength: {
+              value: 10,
+              message: "Error: Please write less then 10.",
+            },
+          })}
+          type="text"
+          required
+          maxLength={10}
+        />
+        <FormBtn>Add</FormBtn>
+        <Error>{errors.text?.message}</Error>
+      </Form>
     </HeaderContainer>
   );
 }
