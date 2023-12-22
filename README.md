@@ -366,4 +366,7 @@
 - **23-12-20 : Deploy(2)**
   - Fix : to-do 입력 시 무조건 홈으로 이동하도록 수정
   - Update : rich link preview, favicon 추가
-  - Issue : 썸네일이 제대로 출력되지 않는 현상
+  - ~~Issue : rich link preview의 썸네일이 제대로 출력되지 않는 현상~~
+- **23-12-22 : Deploy(3)**
+  - Fix : rich link preview의 썸네일이 제대로 출력되지 않는 현상 수정
+    - <a href="https://veonr.com/blog/relative-vs-absolute-og-image-video-urls" target="_blank">상대경로를 사용하지 말고, 프로토콜을 포함한 전체 URL 경로를 사용할 것</a>
